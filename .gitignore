@@ -1,0 +1,21 @@
+# Binaries
+/indexer
+
+# Vendor
+/vendor/
+
+# Environment
+.env
+.env.*.local
+
+# IDE
+*.swp
+*.user
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
