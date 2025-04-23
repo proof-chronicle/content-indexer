@@ -18,11 +18,11 @@ func main() {
 	// RabbitMQ connection settings
 	rabbitURL := os.Getenv("RABBITMQ_URL")
 	if rabbitURL == "" {
-		rabbitURL = "amqp://rabbit:password@rabbitmq:5672/"
+		failOnError(nil, "RABBITMQ_URL environment variable not set")
 	}
 	queueName := os.Getenv("QUEUE_NAME")
 	if queueName == "" {
-		queueName = "index_tasks"
+		failOnError(nil, "QUEUE_NAME environment variable not set")
 	}
 
 	// Connect to RabbitMQ
@@ -35,26 +35,15 @@ func main() {
 	failOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
-	// Declare the queue in case it doesn't exist
-	q, err := ch.QueueDeclare(
-		queueName, // name
-		true,      // durable
-		false,     // delete when unused
-		false,     // exclusive
-		false,     // no-wait
-		nil,       // arguments
-	)
-	failOnError(err, "Failed to declare a queue")
-
 	// Consume messages
 	msgs, err := ch.Consume(
-		q.Name, // queue
-		"",     // consumer
-		true,   // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // args
+		queueName, // queue
+		"",        // consumer
+		true,      // auto-ack
+		false,     // exclusive
+		false,     // no-local
+		false,     // no-wait
+		nil,       // args
 	)
 	failOnError(err, "Failed to register a consumer")
 
