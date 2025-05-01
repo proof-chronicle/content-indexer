@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"os"
 
+	"github.com/proofchronicle/content-indexer/pkg/indexer"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -51,6 +53,21 @@ func main() {
 
 	// Process messages
 	for d := range msgs {
+		var message Message
+		if err := json.Unmarshal(d.Body, &message); err != nil {
+			log.Printf("Error decoding JSON: %v", err)
+			continue
+		}
+
+		indexer.Index(message)
+
 		log.Printf("[x] Received new message: %s", string(d.Body))
 	}
+}
+
+type Message struct {
+	PageId          string `json:"page_id"`
+	Url             string `json:"url"`
+	ContentSelector string `json:"content_selector"`
+	LatestHash      string `json:"latest_hash"`
 }
