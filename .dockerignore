@@ -1,0 +1,25 @@
+# Ignore binaries
+content-indexer
+*.exe
+*.out
+
+# Ignore vendor if not needed (if using Go modules)
+vendor/
+
+# Ignore Git files
+.git
+.gitignore
+
+# Ignore editor and OS files
+*.swp
+*.swo
+*.DS_Store
+*.idea
+.vscode
+
+# Ignore temporary files and build artifacts
+*.log
+*.cache
+
+# Ignore environment files (if you don’t want to copy them into the image)
+.env
