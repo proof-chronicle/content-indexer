@@ -19,8 +19,6 @@ A Go-based worker service responsible for:
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
   - [Configuration](#configuration)
-  - [Usage](#usage)
-  - [Docker](#docker)
   - [Development](#development)
   - [License](#license)
 
@@ -55,7 +53,7 @@ A Go-based worker service responsible for:
 
 ## Prerequisites
 
-- Go 1.20+
+- Go 1.24+
 - Docker (for local development)
 - RabbitMQ instance
 - MySQL (or compatible) database
@@ -104,52 +102,15 @@ BROWSER_TIMEOUT=30s
 
 ---
 
-## Usage
-
-```bash
-# Run locally
-go run ./cmd/indexer \
-  --env .env \
-  --log-level info
-
-# Build and run binary
-go build -o indexer ./cmd/indexer
-./indexer --env .env
-```
-
----
-
-## Docker
-
-Build and run with Docker Compose (from infra folder):
-
-```yaml
-# infra/docker-compose.yml
-services:
-  indexer:
-    build:
-      context: ../content-indexer
-    env_file:
-      - ../content-indexer/.env
-    depends_on:
-      - rabbitmq
-      - db
-```
-
-Then:
-```bash
-cd infra
-docker-compose up --build indexer
-```
-
----
-
 ## Development
 
 - Use `make lint` and `make test` to verify code quality.
 - Ensure compatibility with latest Go version.
 - Follow the Go project layout conventions.
-
+- generate grpc:
+```bash
+protoc --go_out=. --go-grpc_out=. -I./proto proto/chain_gateway.proto
+```
 ---
 
 ## License
