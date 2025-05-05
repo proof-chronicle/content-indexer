@@ -36,15 +36,9 @@ func (p *Processor) sendToGateway(msg consumer.Message) error {
 
 	log.Printf("Connecting to Chain Gateway at %s", addr)
 
-	// Create a gRPC client with a timeout
-	txCtx, txCancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer txCancel()
-
 	conn, err := grpc.NewClient(
-		txCtx,
 		addr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(),
 	)
 	if err != nil {
 		return fmt.Errorf("failed to create gRPC client for %q: %w", addr, err)
@@ -72,7 +66,7 @@ func (p *Processor) sendToGateway(msg consumer.Message) error {
 
 	storeResp, err := client.Store(storeCtx, storeReq)
 	if err != nil {
-		return fmt.Errorf("Store RPC failed: %w", err)
+		return fmt.Errorf("store RPC failed: %w", err)
 	}
 	log.Printf("Stored: success=%v txid=%s", storeResp.Success, storeResp.TransactionId)
 
@@ -83,7 +77,7 @@ func (p *Processor) sendToGateway(msg consumer.Message) error {
 
 	retrieveResp, err := client.Retrieve(retrieveCtx, retrieveReq)
 	if err != nil {
-		return fmt.Errorf("Retrieve RPC failed: %w", err)
+		return fmt.Errorf("retrieve RPC failed: %w", err)
 	}
 	log.Printf("Retrieved record: %+v", retrieveResp.Record)
 
