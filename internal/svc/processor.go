@@ -54,7 +54,7 @@ func (p *Processor) sendToGateway(msg consumer.Message) error {
 	// Prepare and call Store
 	storeReq := &pb.StoreRequest{
 		Record: &pb.ContentRecord{
-			Uid:       "msg.UID",
+			Uid:       msg.Uid,
 			CreatedAt: time.Now().Format(time.RFC3339),
 			Hash:      msg.Hash,
 			Url:       msg.Url,
