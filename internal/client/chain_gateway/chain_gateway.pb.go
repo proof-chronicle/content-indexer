@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v3.21.12
-// source: chain_gateway.proto
+// source: proto/chain_gateway.proto
 
 package chain_gateway
 
@@ -24,17 +24,18 @@ const (
 // Reusable record for content entries
 type ContentRecord struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Uid           string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`                              // Unique identifier
-	CreatedAt     string                 `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"` // Creation timestamp
-	Hash          string                 `protobuf:"bytes,3,opt,name=hash,proto3" json:"hash,omitempty"`                            // Content hash
-	Url           string                 `protobuf:"bytes,4,opt,name=url,proto3" json:"url,omitempty"`                              // Original URL
+	Uid           string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`                                           // Unique identifier to bind transaction to page version
+	Url           string                 `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`                                           // Page URL
+	ContentHash   string                 `protobuf:"bytes,3,opt,name=content_hash,json=contentHash,proto3" json:"content_hash,omitempty"`        // SHA-256 hash of page content
+	ContentLength uint64                 `protobuf:"varint,4,opt,name=content_length,json=contentLength,proto3" json:"content_length,omitempty"` // Size of original content in bytes
+	Version       uint32                 `protobuf:"varint,5,opt,name=version,proto3" json:"version,omitempty"`                                  // Schema version number
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ContentRecord) Reset() {
 	*x = ContentRecord{}
-	mi := &file_chain_gateway_proto_msgTypes[0]
+	mi := &file_proto_chain_gateway_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -46,7 +47,7 @@ func (x *ContentRecord) String() string {
 func (*ContentRecord) ProtoMessage() {}
 
 func (x *ContentRecord) ProtoReflect() protoreflect.Message {
-	mi := &file_chain_gateway_proto_msgTypes[0]
+	mi := &file_proto_chain_gateway_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -59,7 +60,7 @@ func (x *ContentRecord) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ContentRecord.ProtoReflect.Descriptor instead.
 func (*ContentRecord) Descriptor() ([]byte, []int) {
-	return file_chain_gateway_proto_rawDescGZIP(), []int{0}
+	return file_proto_chain_gateway_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ContentRecord) GetUid() string {
@@ -69,25 +70,32 @@ func (x *ContentRecord) GetUid() string {
 	return ""
 }
 
-func (x *ContentRecord) GetCreatedAt() string {
-	if x != nil {
-		return x.CreatedAt
-	}
-	return ""
-}
-
-func (x *ContentRecord) GetHash() string {
-	if x != nil {
-		return x.Hash
-	}
-	return ""
-}
-
 func (x *ContentRecord) GetUrl() string {
 	if x != nil {
 		return x.Url
 	}
 	return ""
+}
+
+func (x *ContentRecord) GetContentHash() string {
+	if x != nil {
+		return x.ContentHash
+	}
+	return ""
+}
+
+func (x *ContentRecord) GetContentLength() uint64 {
+	if x != nil {
+		return x.ContentLength
+	}
+	return 0
+}
+
+func (x *ContentRecord) GetVersion() uint32 {
+	if x != nil {
+		return x.Version
+	}
+	return 0
 }
 
 // Request to store a content record
@@ -100,7 +108,7 @@ type StoreRequest struct {
 
 func (x *StoreRequest) Reset() {
 	*x = StoreRequest{}
-	mi := &file_chain_gateway_proto_msgTypes[1]
+	mi := &file_proto_chain_gateway_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -112,7 +120,7 @@ func (x *StoreRequest) String() string {
 func (*StoreRequest) ProtoMessage() {}
 
 func (x *StoreRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_chain_gateway_proto_msgTypes[1]
+	mi := &file_proto_chain_gateway_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -125,7 +133,7 @@ func (x *StoreRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StoreRequest.ProtoReflect.Descriptor instead.
 func (*StoreRequest) Descriptor() ([]byte, []int) {
-	return file_chain_gateway_proto_rawDescGZIP(), []int{1}
+	return file_proto_chain_gateway_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *StoreRequest) GetRecord() *ContentRecord {
@@ -137,16 +145,17 @@ func (x *StoreRequest) GetRecord() *ContentRecord {
 
 // Response after storing a record
 type StoreResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
-	TransactionId string                 `protobuf:"bytes,2,opt,name=transaction_id,json=transactionId,proto3" json:"transaction_id,omitempty"` // On-chain transaction ID
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Success        bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	TransactionId  string                 `protobuf:"bytes,2,opt,name=transaction_id,json=transactionId,proto3" json:"transaction_id,omitempty"`    // On-chain transaction ID
+	AccountAddress string                 `protobuf:"bytes,3,opt,name=account_address,json=accountAddress,proto3" json:"account_address,omitempty"` // Solana account address where proof is stored
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *StoreResponse) Reset() {
 	*x = StoreResponse{}
-	mi := &file_chain_gateway_proto_msgTypes[2]
+	mi := &file_proto_chain_gateway_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -158,7 +167,7 @@ func (x *StoreResponse) String() string {
 func (*StoreResponse) ProtoMessage() {}
 
 func (x *StoreResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_chain_gateway_proto_msgTypes[2]
+	mi := &file_proto_chain_gateway_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -171,7 +180,7 @@ func (x *StoreResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StoreResponse.ProtoReflect.Descriptor instead.
 func (*StoreResponse) Descriptor() ([]byte, []int) {
-	return file_chain_gateway_proto_rawDescGZIP(), []int{2}
+	return file_proto_chain_gateway_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *StoreResponse) GetSuccess() bool {
@@ -188,174 +197,82 @@ func (x *StoreResponse) GetTransactionId() string {
 	return ""
 }
 
-// Request to retrieve a content record by UID
-type RetrieveRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	TransactionId string                 `protobuf:"bytes,1,opt,name=transaction_id,json=transactionId,proto3" json:"transaction_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *RetrieveRequest) Reset() {
-	*x = RetrieveRequest{}
-	mi := &file_chain_gateway_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *RetrieveRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RetrieveRequest) ProtoMessage() {}
-
-func (x *RetrieveRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_chain_gateway_proto_msgTypes[3]
+func (x *StoreResponse) GetAccountAddress() string {
 	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RetrieveRequest.ProtoReflect.Descriptor instead.
-func (*RetrieveRequest) Descriptor() ([]byte, []int) {
-	return file_chain_gateway_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *RetrieveRequest) GetTransactionId() string {
-	if x != nil {
-		return x.TransactionId
+		return x.AccountAddress
 	}
 	return ""
 }
 
-// Response containing the requested content record
-type RetrieveResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Record        *ContentRecord         `protobuf:"bytes,1,opt,name=record,proto3" json:"record,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
+var File_proto_chain_gateway_proto protoreflect.FileDescriptor
 
-func (x *RetrieveResponse) Reset() {
-	*x = RetrieveResponse{}
-	mi := &file_chain_gateway_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *RetrieveResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RetrieveResponse) ProtoMessage() {}
-
-func (x *RetrieveResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_chain_gateway_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RetrieveResponse.ProtoReflect.Descriptor instead.
-func (*RetrieveResponse) Descriptor() ([]byte, []int) {
-	return file_chain_gateway_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *RetrieveResponse) GetRecord() *ContentRecord {
-	if x != nil {
-		return x.Record
-	}
-	return nil
-}
-
-var File_chain_gateway_proto protoreflect.FileDescriptor
-
-const file_chain_gateway_proto_rawDesc = "" +
+const file_proto_chain_gateway_proto_rawDesc = "" +
 	"\n" +
-	"\x13chain_gateway.proto\x12\rchain_gateway\"f\n" +
+	"\x19proto/chain_gateway.proto\x12\rchain_gateway\"\x97\x01\n" +
 	"\rContentRecord\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x1d\n" +
-	"\n" +
-	"created_at\x18\x02 \x01(\tR\tcreatedAt\x12\x12\n" +
-	"\x04hash\x18\x03 \x01(\tR\x04hash\x12\x10\n" +
-	"\x03url\x18\x04 \x01(\tR\x03url\"D\n" +
+	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x10\n" +
+	"\x03url\x18\x02 \x01(\tR\x03url\x12!\n" +
+	"\fcontent_hash\x18\x03 \x01(\tR\vcontentHash\x12%\n" +
+	"\x0econtent_length\x18\x04 \x01(\x04R\rcontentLength\x12\x18\n" +
+	"\aversion\x18\x05 \x01(\rR\aversion\"D\n" +
 	"\fStoreRequest\x124\n" +
-	"\x06record\x18\x01 \x01(\v2\x1c.chain_gateway.ContentRecordR\x06record\"P\n" +
+	"\x06record\x18\x01 \x01(\v2\x1c.chain_gateway.ContentRecordR\x06record\"y\n" +
 	"\rStoreResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12%\n" +
-	"\x0etransaction_id\x18\x02 \x01(\tR\rtransactionId\"8\n" +
-	"\x0fRetrieveRequest\x12%\n" +
-	"\x0etransaction_id\x18\x01 \x01(\tR\rtransactionId\"H\n" +
-	"\x10RetrieveResponse\x124\n" +
-	"\x06record\x18\x01 \x01(\v2\x1c.chain_gateway.ContentRecordR\x06record2\x9f\x01\n" +
+	"\x0etransaction_id\x18\x02 \x01(\tR\rtransactionId\x12'\n" +
+	"\x0faccount_address\x18\x03 \x01(\tR\x0eaccountAddress2R\n" +
 	"\fChainGateway\x12B\n" +
-	"\x05Store\x12\x1b.chain_gateway.StoreRequest\x1a\x1c.chain_gateway.StoreResponse\x12K\n" +
-	"\bRetrieve\x12\x1e.chain_gateway.RetrieveRequest\x1a\x1f.chain_gateway.RetrieveResponseB-Z+internal/client/chain_gateway;chain_gatewayb\x06proto3"
+	"\x05Store\x12\x1b.chain_gateway.StoreRequest\x1a\x1c.chain_gateway.StoreResponseB-Z+internal/client/chain_gateway;chain_gatewayb\x06proto3"
 
 var (
-	file_chain_gateway_proto_rawDescOnce sync.Once
-	file_chain_gateway_proto_rawDescData []byte
+	file_proto_chain_gateway_proto_rawDescOnce sync.Once
+	file_proto_chain_gateway_proto_rawDescData []byte
 )
 
-func file_chain_gateway_proto_rawDescGZIP() []byte {
-	file_chain_gateway_proto_rawDescOnce.Do(func() {
-		file_chain_gateway_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_chain_gateway_proto_rawDesc), len(file_chain_gateway_proto_rawDesc)))
+func file_proto_chain_gateway_proto_rawDescGZIP() []byte {
+	file_proto_chain_gateway_proto_rawDescOnce.Do(func() {
+		file_proto_chain_gateway_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_chain_gateway_proto_rawDesc), len(file_proto_chain_gateway_proto_rawDesc)))
 	})
-	return file_chain_gateway_proto_rawDescData
+	return file_proto_chain_gateway_proto_rawDescData
 }
 
-var file_chain_gateway_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
-var file_chain_gateway_proto_goTypes = []any{
-	(*ContentRecord)(nil),    // 0: chain_gateway.ContentRecord
-	(*StoreRequest)(nil),     // 1: chain_gateway.StoreRequest
-	(*StoreResponse)(nil),    // 2: chain_gateway.StoreResponse
-	(*RetrieveRequest)(nil),  // 3: chain_gateway.RetrieveRequest
-	(*RetrieveResponse)(nil), // 4: chain_gateway.RetrieveResponse
+var file_proto_chain_gateway_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_proto_chain_gateway_proto_goTypes = []any{
+	(*ContentRecord)(nil), // 0: chain_gateway.ContentRecord
+	(*StoreRequest)(nil),  // 1: chain_gateway.StoreRequest
+	(*StoreResponse)(nil), // 2: chain_gateway.StoreResponse
 }
-var file_chain_gateway_proto_depIdxs = []int32{
+var file_proto_chain_gateway_proto_depIdxs = []int32{
 	0, // 0: chain_gateway.StoreRequest.record:type_name -> chain_gateway.ContentRecord
-	0, // 1: chain_gateway.RetrieveResponse.record:type_name -> chain_gateway.ContentRecord
-	1, // 2: chain_gateway.ChainGateway.Store:input_type -> chain_gateway.StoreRequest
-	3, // 3: chain_gateway.ChainGateway.Retrieve:input_type -> chain_gateway.RetrieveRequest
-	2, // 4: chain_gateway.ChainGateway.Store:output_type -> chain_gateway.StoreResponse
-	4, // 5: chain_gateway.ChainGateway.Retrieve:output_type -> chain_gateway.RetrieveResponse
-	4, // [4:6] is the sub-list for method output_type
-	2, // [2:4] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	1, // 1: chain_gateway.ChainGateway.Store:input_type -> chain_gateway.StoreRequest
+	2, // 2: chain_gateway.ChainGateway.Store:output_type -> chain_gateway.StoreResponse
+	2, // [2:3] is the sub-list for method output_type
+	1, // [1:2] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
-func init() { file_chain_gateway_proto_init() }
-func file_chain_gateway_proto_init() {
-	if File_chain_gateway_proto != nil {
+func init() { file_proto_chain_gateway_proto_init() }
+func file_proto_chain_gateway_proto_init() {
+	if File_proto_chain_gateway_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_chain_gateway_proto_rawDesc), len(file_chain_gateway_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_chain_gateway_proto_rawDesc), len(file_proto_chain_gateway_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_chain_gateway_proto_goTypes,
-		DependencyIndexes: file_chain_gateway_proto_depIdxs,
-		MessageInfos:      file_chain_gateway_proto_msgTypes,
+		GoTypes:           file_proto_chain_gateway_proto_goTypes,
+		DependencyIndexes: file_proto_chain_gateway_proto_depIdxs,
+		MessageInfos:      file_proto_chain_gateway_proto_msgTypes,
 	}.Build()
-	File_chain_gateway_proto = out.File
-	file_chain_gateway_proto_goTypes = nil
-	file_chain_gateway_proto_depIdxs = nil
+	File_proto_chain_gateway_proto = out.File
+	file_proto_chain_gateway_proto_goTypes = nil
+	file_proto_chain_gateway_proto_depIdxs = nil
 }

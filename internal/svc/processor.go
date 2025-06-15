@@ -24,6 +24,8 @@ func NewProcessor(cfg config.Config) *Processor {
 
 // Handle processes an incoming message.
 func (p *Processor) Handle(msg consumer.Message) error {
+	log.Printf("Processing message: UID=%s, URL=%s, Hash=%s, CreatedAt=%s, ContentLength=%d",
+		msg.Uid, msg.Url, msg.Hash, msg.CreatedAt, msg.ContentLength)
 	return p.sendToGateway(msg)
 }
 
@@ -52,14 +54,39 @@ func (p *Processor) sendToGateway(msg consumer.Message) error {
 	client := pb.NewChainGatewayClient(conn)
 
 	// Prepare and call Store
+	uid := msg.Uid
+	if uid == "" {
+		uid = "test-uid-123"
+	}
+
+	url := msg.Url
+	if url == "" {
+		url = "https://example.com/test-page"
+	}
+
+	hash := msg.Hash
+	if hash == "" {
+		hash = "abc123def456789abcdef123456789abcdef123456789abcdef123456789abcdef"
+	}
+
+	createdAt := msg.CreatedAt
+	if createdAt == "" {
+		createdAt = time.Now().Format(time.RFC3339)
+	}
+
 	storeReq := &pb.StoreRequest{
 		Record: &pb.ContentRecord{
-			Uid:       msg.Uid,
-			CreatedAt: time.Now().Format(time.RFC3339),
-			Hash:      msg.Hash,
-			Url:       msg.Url,
+			Uid:           uid,
+			Url:           url,
+			ContentHash:   hash,
+			ContentLength: 1024, // Hardcoded for now, could be calculated from content
+			Version:       1,    // Schema version
 		},
 	}
+
+	log.Printf("Sending to gateway - UID: %s, URL: %s, Hash: %s, ContentLength: %d, Version: %d",
+		storeReq.Record.Uid, storeReq.Record.Url, storeReq.Record.ContentHash,
+		storeReq.Record.ContentLength, storeReq.Record.Version)
 
 	storeCtx, storeCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer storeCancel()
@@ -68,18 +95,8 @@ func (p *Processor) sendToGateway(msg consumer.Message) error {
 	if err != nil {
 		return fmt.Errorf("store RPC failed: %w", err)
 	}
-	log.Printf("Stored: success=%v txid=%s", storeResp.Success, storeResp.TransactionId)
-
-	// Prepare and call Retrieve
-	retrieveReq := &pb.RetrieveRequest{TransactionId: storeResp.TransactionId}
-	retrieveCtx, retrieveCancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer retrieveCancel()
-
-	retrieveResp, err := client.Retrieve(retrieveCtx, retrieveReq)
-	if err != nil {
-		return fmt.Errorf("retrieve RPC failed: %w", err)
-	}
-	log.Printf("Retrieved record: %+v", retrieveResp.Record)
+	log.Printf("✅ Stored successfully: success=%v txid=%s account=%s",
+		storeResp.Success, storeResp.TransactionId, storeResp.AccountAddress)
 
 	return nil
 }

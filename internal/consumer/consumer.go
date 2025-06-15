@@ -13,6 +13,7 @@ type Message struct {
 	CreatedAt       string `json:"created_at,omitempty"`
 	Hash            string `json:"hash,omitempty"`
 	Url             string `json:"url,omitempty"`
+	ContentLength   uint64 `json:"content_length,omitempty"`
 	ContentSelector string `json:"content_selector,omitempty"`
 }
 

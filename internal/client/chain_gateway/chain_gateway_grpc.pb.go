@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v3.21.12
-// source: chain_gateway.proto
+// source: proto/chain_gateway.proto
 
 package chain_gateway
 
@@ -19,8 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ChainGateway_Store_FullMethodName    = "/chain_gateway.ChainGateway/Store"
-	ChainGateway_Retrieve_FullMethodName = "/chain_gateway.ChainGateway/Retrieve"
+	ChainGateway_Store_FullMethodName = "/chain_gateway.ChainGateway/Store"
 )
 
 // ChainGatewayClient is the client API for ChainGateway service.
@@ -29,8 +28,6 @@ const (
 type ChainGatewayClient interface {
 	// Store a new content record on-chain
 	Store(ctx context.Context, in *StoreRequest, opts ...grpc.CallOption) (*StoreResponse, error)
-	// Retrieve an existing content record by its transaction_id
-	Retrieve(ctx context.Context, in *RetrieveRequest, opts ...grpc.CallOption) (*RetrieveResponse, error)
 }
 
 type chainGatewayClient struct {
@@ -51,24 +48,12 @@ func (c *chainGatewayClient) Store(ctx context.Context, in *StoreRequest, opts .
 	return out, nil
 }
 
-func (c *chainGatewayClient) Retrieve(ctx context.Context, in *RetrieveRequest, opts ...grpc.CallOption) (*RetrieveResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RetrieveResponse)
-	err := c.cc.Invoke(ctx, ChainGateway_Retrieve_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // ChainGatewayServer is the server API for ChainGateway service.
 // All implementations must embed UnimplementedChainGatewayServer
 // for forward compatibility.
 type ChainGatewayServer interface {
 	// Store a new content record on-chain
 	Store(context.Context, *StoreRequest) (*StoreResponse, error)
-	// Retrieve an existing content record by its transaction_id
-	Retrieve(context.Context, *RetrieveRequest) (*RetrieveResponse, error)
 	mustEmbedUnimplementedChainGatewayServer()
 }
 
@@ -81,9 +66,6 @@ type UnimplementedChainGatewayServer struct{}
 
 func (UnimplementedChainGatewayServer) Store(context.Context, *StoreRequest) (*StoreResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Store not implemented")
-}
-func (UnimplementedChainGatewayServer) Retrieve(context.Context, *RetrieveRequest) (*RetrieveResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Retrieve not implemented")
 }
 func (UnimplementedChainGatewayServer) mustEmbedUnimplementedChainGatewayServer() {}
 func (UnimplementedChainGatewayServer) testEmbeddedByValue()                      {}
@@ -124,24 +106,6 @@ func _ChainGateway_Store_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ChainGateway_Retrieve_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RetrieveRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ChainGatewayServer).Retrieve(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ChainGateway_Retrieve_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ChainGatewayServer).Retrieve(ctx, req.(*RetrieveRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // ChainGateway_ServiceDesc is the grpc.ServiceDesc for ChainGateway service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -153,11 +117,7 @@ var ChainGateway_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "Store",
 			Handler:    _ChainGateway_Store_Handler,
 		},
-		{
-			MethodName: "Retrieve",
-			Handler:    _ChainGateway_Retrieve_Handler,
-		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "chain_gateway.proto",
+	Metadata: "proto/chain_gateway.proto",
 }
